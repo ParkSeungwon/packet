@@ -1,14 +1,13 @@
 #pragma once
 #include<string>
+#include<sys/socket.h>
 #include"netheaders.h"
 
 class Packet
 {
 public:
-	struct ether_header ethernet_header = {
-		{0x00, 0x08, 0x7c, 0x12, 0xac, 0x0a},//dest mac
-		{0x10, 0x02, 0xb5, 0x13, 0x32, 0xa1},//src mac wlp1s0
-		0x0800//type ip, 0x0806-arp
+	struct ether_header ethernet_header = { 
+		{0x00, }, {0x00, }, 0x0800//type ip, 0x0806-arp
 	};
 	struct ip ip_header = {
 		5,//IHL Little endian 작은 수가 앞에 온다.
@@ -30,8 +29,15 @@ public:
 
 	Packet();
 	void show();
+	void send();
 	
 protected:
-	unsigned char gateway_mac_address[6];
 	std::string device;
+	struct sockaddr_ll devll;
+	int sd;
+
+private:
+	void fill_gateway_mac();
+	void fill_my_mac();
+	void fill_devll();
 };

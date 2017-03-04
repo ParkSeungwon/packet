@@ -1,8 +1,9 @@
 #pragma once
-struct in_addr {
+#include<arpa/inet.h>
+/*struct in_addr {
 	u_int32_t s_addr;
 };
-
+*/
 struct ether_header {
 	u_int8_t  ether_dhost[6];	/* destination eth addr	*/
 	u_int8_t  ether_shost[6];	/* source ether addr	*/
@@ -39,3 +40,13 @@ struct tcpheader {
 	unsigned short int th_flags;
 	unsigned short int th_win, th_sum, th_urp;
 };
+
+ struct sockaddr_ll {
+	 unsigned short sll_family;   /* Always AF_PACKET */
+	 unsigned short sll_protocol; /* Physical-layer protocol */
+	 int            sll_ifindex;  /* Interface number */
+	 unsigned short sll_hatype;   /* ARP hardware type */
+	 unsigned char  sll_pkttype;  /* Packet type */
+	 unsigned char  sll_halen;    /* Length of address */
+	 unsigned char  sll_addr[8];  /* Physical-layer address */
+ };
