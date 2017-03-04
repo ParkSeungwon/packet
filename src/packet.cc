@@ -16,11 +16,16 @@ Packet::Packet()
 {
 	string s = psstm("arp -a");
 	regex e{R"(([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}).+ on (\S+))"};
-	cout << "here" << endl;
 	smatch m;
 	if(regex_search(s, m, e)) {
-		for(int i=0; i<6; i++) gateway_mac_address[i] = stoi(m[i+1].str(), nullptr, 16);
+		for(int i=0; i<6; i++) gateway_mac_address[i] = stoi(m[i+1].str(), 0, 16);
 		device = m[7].str();
 	}
 }
 
+void Packet::show()
+{
+	cout << device << " : ";
+	for(int i=0; i<6; i++) cout << hex << +gateway_mac_address[i] << ':';
+	cout << "\b \n";
+}

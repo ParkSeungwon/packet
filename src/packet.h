@@ -1,8 +1,6 @@
 #pragma once
-#include<net/ethernet.h>//ethernet header
-#include<netinet/tcp.h>//tcp header
-#include<netinet/ip.h>//ip header
 #include<string>
+#include"netheaders.h"
 
 class Packet
 {
@@ -25,22 +23,14 @@ public:
 		{0},	//source in_addr
 		{0}	//dest in_addr	
 	};
-	struct tcphdr tcp_header; /*= {
-		80,//source port
-		80,//dest port
-		0,//sequence number
-		0,//acknowledgement number
-		0,//unused
-		5,//dataoffset
+	struct tcpheader tcp_header = { 80, 80, 0, 0, 0, 5,
 		0x02,//flags 0x01 FIN, 0x02 SYN, 0x04 RST, 0x08 PUSH,0x10 ACK, 0x20 URG
-		0,//window
-		0,//checksum
-		0//urgent pointer
-	};*/
+		0, 0, 0 };
 	char data[4096];
 
 	Packet();
-
+	void show();
+	
 protected:
 	unsigned char gateway_mac_address[6];
 	std::string device;
