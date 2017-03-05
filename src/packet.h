@@ -29,7 +29,6 @@ public:
 	Packet();
 	void show();
 	void send();
-	void set_ipsrc(const char* s);
 	void set_ipdst(const char* s);
 	
 protected:

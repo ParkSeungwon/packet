@@ -12,9 +12,10 @@ uint16_t tcp4_checksum (struct ip iphdr, struct tcpheader tcphdr,
 
 static string psstm(string command)
 {//return system call output as string
-	char buf[1000];
+	char buf[1000], tmp[1000];
+	buf[0] = '\0';
 	FILE* f = popen(command.c_str(), "r");
-	fgets(buf, sizeof(buf), f);
+	while(fgets(tmp, sizeof(tmp), f)) strcat(buf, tmp);
 	pclose(f);
 	return buf;
 }
@@ -30,12 +31,6 @@ Packet::Packet()
 	fill_devll();
 }
 
-void Packet::set_ipsrc(const char* s)
-{
-	auto* a = gethostbyname(s);
-	memcpy(&ip_header.ip_src, (struct in_addr*)a->h_addr, sizeof(struct in_addr));
-}
-
 void Packet::set_ipdst(const char* s)
 {
 	auto* a = gethostbyname(s);
@@ -44,11 +39,10 @@ void Packet::set_ipdst(const char* s)
 
 void Packet::send()
 {
-	int len = strlen(data);
+	int len = strlen(data) + 1;
 	ip_header.ip_len = htons(40 + len);
 	ip_header.ip_sum = checksum((const uint16_t*)&ip_header, 20);
 	tcp_header.th_sum = tcp4_checksum(ip_header, tcp_header,(const uint8_t*)data, len);
-	cout << sizeof(ethernet_header) << endl;
 	for(int i=0; i<54+len; i++) cout << hex << +*((unsigned char*)this+i) << ' ';
 	if(sendto(sd, this, 54+len, 0, (struct sockaddr*)&devll, sizeof(devll)) <= 0) {
 		perror ("sendto() failed");
@@ -71,13 +65,14 @@ void Packet::fill_gateway_mac()
 void Packet::fill_my_mac()
 {
 	string s = device;
-	s += R"raw(.+HWaddr ([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}))raw";
+	s += R"raw(.+HWaddr ([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2}):([a-f\d]{2})\s+inet addr:(\S+))raw";
 	regex e{s};
 	smatch m;
 	string r = psstm("ifconfig");
 	if(regex_search(r, m, e)) 
 		for(int i=0; i<6; i++) 
 			ethernet_header.ether_shost[i] = stoi(m[i+1].str(), 0, 16);
+	inet_aton(m[7].str().data(), &ip_header.ip_src);
 }
 
 void Packet::fill_devll()
