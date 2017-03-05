@@ -1,12 +1,14 @@
 #include<regex>
+#include<iomanip>
 #include<iostream>
 #include<net/if.h>
+#include<netdb.h>
 #include"packet.h"
 using namespace std;
 
-uint16_t checksum (uint16_t *addr, int len);
+uint16_t checksum (const uint16_t *addr, int len);
 uint16_t tcp4_checksum (struct ip iphdr, struct tcpheader tcphdr, 
-		uint8_t *payload, int payloadlen);
+		const uint8_t *payload, int payloadlen);
 
 static string psstm(string command)
 {//return system call output as string
@@ -28,17 +30,32 @@ Packet::Packet()
 	fill_devll();
 }
 
+void Packet::set_ipsrc(const char* s)
+{
+	auto* a = gethostbyname(s);
+	memcpy(&ip_header.ip_src, (struct in_addr*)a->h_addr, sizeof(struct in_addr));
+}
+
+void Packet::set_ipdst(const char* s)
+{
+	auto* a = gethostbyname(s);
+	memcpy(&ip_header.ip_dst, (struct in_addr*)a->h_addr, sizeof(struct in_addr));
+}
+
 void Packet::send()
 {
 	int len = strlen(data);
 	ip_header.ip_len = htons(40 + len);
-	ip_header.ip_sum = checksum((uint16_t*)&ip_header, 20);
-	tcp_header.th_sum = tcp4_checksum(ip_header, tcp_header, (uint8_t*)data, len);
+	ip_header.ip_sum = checksum((const uint16_t*)&ip_header, 20);
+	tcp_header.th_sum = tcp4_checksum(ip_header, tcp_header,(const uint8_t*)data, len);
+	cout << sizeof(ethernet_header) << endl;
+	for(int i=0; i<54+len; i++) cout << hex << +*((unsigned char*)this+i) << ' ';
 	if(sendto(sd, this, 54+len, 0, (struct sockaddr*)&devll, sizeof(devll)) <= 0) {
 		perror ("sendto() failed");
 		exit (EXIT_FAILURE);
 	}
 }
+
 void Packet::fill_gateway_mac()
 {
 	string s = psstm("arp -a");

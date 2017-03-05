@@ -8,17 +8,11 @@ struct ether_header {
 	u_int8_t  ether_dhost[6];	/* destination eth addr	*/
 	u_int8_t  ether_shost[6];	/* source ether addr	*/
 	u_int16_t ether_type;		        /* packet type ID field	*/
-}; 
+}__attribute__((packed)); 
 
 struct ip {
-#if __BYTE_ORDER == __LITTLE_ENDIAN
 	unsigned int ip_hl:4;		/* header length */
 	unsigned int ip_v:4;		/* version */
-#endif
-#if __BYTE_ORDER == __BIG_ENDIAN
-	unsigned int ip_v:4;		/* version */
-	unsigned int ip_hl:4;		/* header length */
-#endif
 	u_int8_t ip_tos;			/* type of service */
 	u_short ip_len;			/* total length */
 	u_short ip_id;			/* identification */
@@ -31,7 +25,7 @@ struct ip {
 	u_int8_t ip_p;			/* protocol */
 	u_short ip_sum;			/* checksum */
 	struct in_addr ip_src, ip_dst;	/* source and dest address */
-};
+}__attribute__((packed));//need this to get rid of auto padding
 
 struct tcpheader {
 	unsigned short int th_sport, th_dport;
@@ -39,7 +33,7 @@ struct tcpheader {
 	unsigned char th_x2:4, th_off:4;//always write together, to avoid endian prob
 	unsigned short int th_flags;
 	unsigned short int th_win, th_sum, th_urp;
-};
+}__attribute__((packed));
 
  struct sockaddr_ll {
 	 unsigned short sll_family;   /* Always AF_PACKET */

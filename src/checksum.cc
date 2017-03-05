@@ -1,7 +1,7 @@
 #include"netheaders.h"
 #include<cstring>
 
-uint16_t checksum (uint16_t *addr, int len)
+uint16_t checksum (const uint16_t *addr, int len)
 {
   int count = len;
   register uint32_t sum = 0;
@@ -33,7 +33,7 @@ uint16_t checksum (uint16_t *addr, int len)
 
 // Build IPv4 TCP pseudo-header and call checksum function.
 uint16_t tcp4_checksum (struct ip iphdr, struct tcpheader tcphdr, 
-		uint8_t *payload, int payloadlen)
+		const uint8_t *payload, int payloadlen)
 {
   uint16_t svalue;
   char buf[65535], cvalue;
