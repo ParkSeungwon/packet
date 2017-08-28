@@ -22,7 +22,7 @@ public:
 		{0},	//source in_addr
 		{0}	//dest in_addr	
 	};
-	struct tcpheader tcp_header = { htons(80), htons(80), 0, 0, 0, 5,
+	struct tcpheader tcp_header = { htons(2002), htons(80), 0, 0, 0, 5,
 		0x02,//flags 0x01 FIN, 0x02 SYN, 0x04 RST, 0x08 PUSH,0x10 ACK, 0x20 URG
 		0, 0, 0 };
 	char data[4096];

@@ -71,8 +71,8 @@ void Packet::fill_my_mac()
 	string r = psstm("ifconfig");
 	if(regex_search(r, m, e)) 
 		for(int i=0; i<6; i++) 
-			ethernet_header.ether_shost[i] = stoi(m[i+1].str(), 0, 16);
-	inet_aton(m[7].str().data(), &ip_header.ip_src);
+			ethernet_header.ether_shost[i] = stoi(m[i+1].str(), 0, 16);//mac
+	inet_aton(m[7].str().data(), &ip_header.ip_src);//ip string -> in_addr
 }
 
 void Packet::fill_devll()
